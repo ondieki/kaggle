@@ -1,42 +1,15 @@
 import csv
-import collections 
+import collections
 import sys
 import numpy
+import sklearn
+import cPickle as pickle
+from sklearn.datasets import load_svmlight_file
 
-def readData():
-    with open('train.csv', 'rU') as csvfile:
-        reader = csv.reader(csvfile)
-        #Skips the column headers --eg. latitude, longitude, crime location etc
-        #reader.next()
-        K = 20
-        featureList = []
-        labelList = []
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
-        for row in reader:
-            labels = row[:len(row)-1]
-            features = row[len(row)-1]
-            if K == 0: break;
-            features = features.strip() #removes the leading space
-            features = features.split(' ')  
-            labels.append(features[0]) #append to label list for training example
-            features = features[1:]    #we have ##:## tuples now
-            #print labels ,"  =========  ",features
-            K-=1
-            featureList.append(features)
-            labelList.append(labels)
-    with open("trainlabels.txt", "a") as labelFile:
-        for itemlabel in labelList:
-            for category in itemlabel:
-                labelFile.write(category + ',');
-            labelFile.write('\n')   
-    with open('trainfeatures.txt', "a") as featureFile:
-            for itemFeatures in featureList:
-                for tup in itemFeatures:
-                    featureFile.write(tup + ',')
-                featureFile.write('\n')
-    labelFile.close()
-    featureFile.close()
-
-        
-if __name__ == "__main__":
-    readData();
+X,Y = load_svmlight_file("space_rm.csv", multilabel=True)
+save_object(X, 'trainX.pk1')
+save_object(Y, 'trainY.pk1')
